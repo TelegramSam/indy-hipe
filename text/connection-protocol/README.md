@@ -1,21 +1,68 @@
 - Name: Connection Protocol
 - Authors: Ryan West ryan.west@sovrin.org, Daniel Bluhm daniel.bluhm@sovrin.org, Matthew Hailstone, Stephen Curran, Sam Curren <sam@sovrin.org>
 - Start Date: 2018-6-29
-- PR:
+- PR: https://github.com/hyperledger/indy-hipe/pull/54
 - Jira Issue: https://jira.hyperledger.org/browse/IA-18
 
-# Summary
+# HIPE 00?? - connection 1.0 protocol
 [summary]: #summary
 
-This HIPE describes the protocol to establish connections between agents with the assumption that message transportation is [solved](https://github.com/hyperledger/indy-hipe/pull/21). We assume that the DIDs exchanged are recorded on a public ledger. We also describe how we will accommodate Peer DIDs and how we will adapt this connection protocol when that work is complete.
+This HIPE describes the protocol to establish connections between agents with the assumption that [message routing](https://github.com/hyperledger/indy-hipe/pull/21) and [wire format](https://github.com/hyperledger/indy-hipe/pull/43) are solved. We assume that the DIDs exchanged during connection are recorded and maintained in whatever way their associated DID method prescribes.
 
 # Motivation
 [motivation]: #motivation
 
-Indy agent developers want to create agents that are able to establish connections with each other and exchange secure information over those connections. For this to happen there must be a clear connection protocol.
+Developers of self-sovereign tech want to create agents that can establish connections and exchange information securely. For this to happen there must be a clear connection protocol.
 
 # Tutorial
 [tutorial]: #tutorial
+
+### Key Concepts
+When Alice wants to connect to Bob, she may not know whether Bob already has an agent that's capable
+of agent-to-agent communication. Supporting the case where Bob lacks such an agent is vital to the
+virality and adoption of SSI; it cannot be ignored as a secondary concern.
+
+Therefore, connection is a 2-phase process. In the first phase, called __invite__,
+Alice sends an invitation using conventional communication and security mechanisms. For example,
+she might deliver this invitation by SMS, email, bluetooth, a QR code on her web page, or any other
+convenient means. Alice's invitation should provide enough information that Bob can begin participating
+in the ecosystem, if he is new to it. If Bob already has an agent, he passes through
+this phase effortlessly and instantly. If Alice is a public institution, the invitation
+to connect may be public and open to anyone, instead of customized to Bob.
+
+In the second phase, called __build__, traditional agent-to-agent communication is used to
+share the DIDs, keys, and endpoints that serve as building blocks of an SSI relationship. At the
+end of the _build_ phase, Alice and Bob each know the initial state of both sides of
+their connection, and are prepared to maintain that connection as it evolves.
+
+Once the build phase is complete, Alice and Bob may wish to exchange proofs so they
+can decide how much to trust each other. This is a desirable best practice, but is
+beyond the scope of connection. They may also need to maintain their connection
+across events such as key rotation and endpoint update. This, too, involves
+different protocol described in several additional HIPEs and DID method specs.
+
+### Roles
+
+Connection uses two roles: __inviter__ and __invitee__.
+
+The _inviter_ is the party that initiates the protocol with an `invitation` message. This party
+must already have an agent and be capable of creating DIDs and endpoints
+at which they are prepared to interact. It is desirable but not strictly required that inviters
+have the ability to help the invitee with the process and/or costs associated with acquiring
+an agent capable of participating in the ecosystem. For example, inviters may often be sponsoring
+institutions. The inviter sends a `connection-response` message at the end of the _share_ phase.
+
+The _invitee_ has less preconditions; the only requirement is that this party be capable of
+receiving invitations over traditional communication channels of some type, and acting on
+it in a way that leads to successful interaction. The invitee sends a `connection-request` message
+at the beginning of the _share_ phase.
+
+In cases where both parties already possess SSI capabilities, deciding who plays the role of inviter
+and invitee may be a casual matter of whose phone is handier.
+
+### States
+
+![inviter state machine](inviter-state-machine.png)
 
 We present the scenario in which Alice and Bob wish to communicate. The following interactions and messages must be sent between them to establish a secure, persistent channel for communication:
 
