@@ -84,7 +84,32 @@ intelligence to handle. (How many times have we written emails with multiple
 attachments, and added verbiage like, "My photo of the door is attached as
 image1.jpeg; my photo of the damaged trunk is attached as image2.jpeg"?)
 
-### More ways of attaching
+### Content Formats
+
+There are multiple ways to include content in an attachment. Only one method should be used per attachment.
+
+#### base64
+
+Base 64 content encoding is an obvious choice for any content different than json. You can embed content of any type using this method. Examples are plentiful throughout the document.
+
+#### json
+
+If you are embedding an attachment that is json, you can embed it directly in json format to make access easier. 
+
+```json
+{
+      "nickname": "embeddedjsonexample",
+      "content": {
+          "json": {
+              "myembbedded": "jsonattributes"
+          }
+      }
+}
+```
+
+
+
+#### links
 
 The example discussed above includes an attachment *by value*--that is, the
 attachment's bytes are directly inlined in the `content.base64` field. This
